@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — TicketBook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <div class="admin-layout">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <div class="brand-logo" onclick="window.location.href='index.html'">
+          <div class="brand-icon">🛡️</div>
+          <div class="brand-text">
+            <div class="brand-name">Ticket<span>Book</span></div>
+            <div class="brand-tagline">ADMIN CONTROL PANEL</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="admin-nav-list">
+        <li>
+          <a class="admin-nav-item active" id="admin-nav-dashboard" onclick="switchAdminTab('dashboard')">
+            <span>📊</span> Dashboard
+          </a>
+        </li>
+        <li>
+          <a class="admin-nav-item" id="admin-nav-events" onclick="switchAdminTab('events')">
+            <span>🎬</span> Manage Events
+          </a>
+        </li>
+        <li>
+          <a class="admin-nav-item" id="admin-nav-add-event" onclick="switchAdminTab('add-event')">
+            <span>➕</span> Add New Event
+          </a>
+        </li>
+        <li>
+          <a class="admin-nav-item" id="admin-nav-bookings" onclick="switchAdminTab('bookings')">
+            <span>🎟️</span> All Bookings
+          </a>
+        </li>
+        <li>
+          <a class="admin-nav-item" id="admin-nav-users" onclick="switchAdminTab('users')">
+            <span>👥</span> Registered Users
+          </a>
+        </li>
+      </ul>
+
+      <div class="admin-sidebar-footer">
+        <a href="index.html" class="btn btn-outline btn-sm btn-block" style="margin-bottom: 8px;">
+          🌐 View User Portal
+        </a>
+        <button class="btn btn-secondary btn-sm btn-block" onclick="logoutUser()">
+          🚪 Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Admin Main Content Area -->
+    <main class="admin-main">
+      <!-- Top Bar -->
+      <div class="admin-topbar">
+        <div>
+          <h1 id="admin-page-title" style="font-size: 1.8rem; font-weight: 800; color: #fff;">Dashboard Overview</h1>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Live statistics and system controls synced with LocalStorage</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="user-badge">
+            <div class="user-avatar" style="background: linear-gradient(135deg, var(--danger), var(--primary));">A</div>
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 700;" id="admin-user-name">Administrator</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan);">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 1: DASHBOARD OVERVIEW
+           ========================================== -->
+      <section id="admin-tab-dashboard" class="admin-tab-pane">
+        <!-- KPI Statistics Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-box kpi-icon-blue">👥</div>
+            <div class="kpi-info-box">
+              <span class="kpi-val" id="stat-total-users">0</span>
+              <span class="kpi-label">Total Users</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-box kpi-icon-indigo">🎬</div>
+            <div class="kpi-info-box">
+              <span class="kpi-val" id="stat-total-events">0</span>
+              <span class="kpi-label">Active Events</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-box kpi-icon-purple">🎟️</div>
+            <div class="kpi-info-box">
+              <span class="kpi-val" id="stat-total-bookings">0</span>
+              <span class="kpi-label">Total Bookings</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-box kpi-icon-green">💰</div>
+            <div class="kpi-info-box">
+              <span class="kpi-val" id="stat-total-revenue">₹0</span>
+              <span class="kpi-label">Confirmed Revenue</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Bookings Table -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff;">Recent Bookings Across All Malls</h3>
+          <button class="btn btn-outline btn-sm" onclick="switchAdminTab('bookings')">View All →</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer</th>
+                <th>Event</th>
+                <th>Mall</th>
+                <th>Seats</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-recent-bookings-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: EVENTS MANAGEMENT
+           ========================================== -->
+      <section id="admin-tab-events" class="admin-tab-pane" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 12px; flex-grow: 1; max-width: 450px;">
+            <input type="text" id="admin-event-search" class="form-control" placeholder="Search events by title or category..." oninput="filterAdminEvents()">
+          </div>
+          <button class="btn btn-primary" onclick="switchAdminTab('add-event')">➕ Add New Event</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Poster</th>
+                <th>Event Name</th>
+                <th>Category</th>
+                <th>Mall & Venue</th>
+                <th>Date & Time</th>
+                <th>Price</th>
+                <th>Booked / Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-events-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: ADD / EDIT EVENT FORM
+           ========================================== -->
+      <section id="admin-tab-add-event" class="admin-tab-pane" style="display: none;">
+        <div class="payment-card" style="max-width: 850px; margin: 0 auto;">
+          <h2 id="admin-event-form-title" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Create New Event</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+            Added events instantly synchronize with the user booking catalog in LocalStorage.
+          </p>
+
+          <form id="admin-event-form" onsubmit="handleAdminSaveEvent(event)">
+            <input type="hidden" id="event-form-edit-id" value="">
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label class="form-label" for="event-form-title">Event Name *</label>
+                <input type="text" id="event-form-title" class="form-control" placeholder="e.g. Avengers: Secret Wars" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-form-category">Category *</label>
+                <select id="event-form-category" class="form-control" required>
+                  <option value="Movie">Movie</option>
+                  <option value="Music">Music</option>
+                  <option value="Comedy">Comedy</option>
+                  <option value="Sports">Sports</option>
+                  <option value="Theatre">Theatre</option>
+                  <option value="Events">Special Event</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-form-desc">Description / Synopsis *</label>
+              <textarea id="event-form-desc" class="form-control" rows="3" placeholder="Enter event details and synopsis..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-form-image">Image / Poster URL</label>
+              <input type="url" id="event-form-image" class="form-control" placeholder="https://images.unsplash.com/... or choose preset below">
+              <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
+                Quick Presets:
+                <button type="button" class="demo-chip" onclick="setEventImagePreset('movie')">Movie</button>
+                <button type="button" class="demo-chip" onclick="setEventImagePreset('music')">Music</button>
+                <button type="button" class="demo-chip" onclick="setEventImagePreset('comedy')">Comedy</button>
+                <button type="button" class="demo-chip" onclick="setEventImagePreset('sports')">Sports</button>
+                <button type="button" class="demo-chip" onclick="setEventImagePreset('theatre')">Theatre</button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label class="form-label" for="event-form-mall">Mall *</label>
+                <select id="event-form-mall" class="form-control" required>
+                  <!-- Populated from malls in LocalStorage -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-form-venue">Venue / Audi *</label>
+                <input type="text" id="event-form-venue" class="form-control" placeholder="e.g. Audi 2 / Main Arena" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label class="form-label" for="event-form-date">Date *</label>
+                <input type="date" id="event-form-date" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-form-time">Time *</label>
+                <input type="text" id="event-form-time" class="form-control" placeholder="07:30 PM" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-form-duration">Duration</label>
+                <input type="text" id="event-form-duration" class="form-control" placeholder="e.g. 2h 45m" value="2h 30m">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label class="form-label" for="event-form-lang">Language</label>
+                <input type="text" id="event-form-lang" class="form-control" placeholder="English, Hindi" value="English">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-form-price">Ticket Price (₹) *</label>
+                <input type="number" id="event-form-price" class="form-control" min="50" max="10000" placeholder="250" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-form-seats">Total Seats</label>
+                <input type="number" id="event-form-seats" class="form-control" value="40" readonly title="Cinema standard: 40 seats (A1-E8)">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+              <button type="submit" class="btn btn-primary btn-lg" id="event-form-submit-btn">Save & Publish Event</button>
+              <button type="button" class="btn btn-secondary btn-lg" onclick="switchAdminTab('events')">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: ALL BOOKINGS
+           ========================================== -->
+      <section id="admin-tab-bookings" class="admin-tab-pane" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 14px; flex-wrap: wrap;">
+          <input type="text" id="admin-booking-search" class="form-control" style="max-width: 380px;" placeholder="Search by Booking ID, customer or event..." oninput="filterAdminBookings()">
+          <select id="admin-booking-filter-status" class="form-control" style="max-width: 200px;" onchange="filterAdminBookings()">
+            <option value="All">All Statuses</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer</th>
+                <th>Event</th>
+                <th>Mall</th>
+                <th>Date & Time</th>
+                <th>Seats</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-bookings-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: REGISTERED USERS
+           ========================================== -->
+      <section id="admin-tab-users" class="admin-tab-pane" style="display: none;">
+        <div style="margin-bottom: 20px;">
+          <input type="text" id="admin-user-search" class="form-control" style="max-width: 380px;" placeholder="Search user by name or email..." oninput="filterAdminUsers()">
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Total Bookings</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Shared Script File -->
+  <script src="script.js"></script>
+</body>
+</html>

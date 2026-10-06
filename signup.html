@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — TicketBook</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 500px;">
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand-logo" style="justify-content: center; margin-bottom: 8px;">
+        <div class="brand-icon" style="width: 48px; height: 48px; font-size: 1.4rem;">🎟️</div>
+      </a>
+
+      <div class="auth-header">
+        <h1 class="auth-title">Create Your <span class="text-gradient">TicketBook</span> Account</h1>
+        <p class="auth-subtitle">Join thousands booking premier experiences every day</p>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="signup-form" onsubmit="handleSignupSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" class="form-control" placeholder="Enter your full name" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" class="form-control" placeholder="name@example.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-phone">Phone Number</label>
+          <input type="tel" id="signup-phone" class="form-control" placeholder="10-digit mobile number (e.g. 9876543210)" pattern="[0-9]{10}" maxlength="10" required autocomplete="tel">
+          <small style="color: var(--text-dim); font-size: 0.78rem;">Must be 10 digits</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-password">Password</label>
+          <div class="input-password-wrapper">
+            <input type="password" id="signup-password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('signup-password')">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-confirm-password">Confirm Password</label>
+          <div class="input-password-wrapper">
+            <input type="password" id="signup-confirm-password" class="form-control" placeholder="Re-enter password" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('signup-confirm-password')">👁️</button>
+          </div>
+        </div>
+
+        <div id="signup-error-msg" class="form-error" style="margin-bottom: 14px; text-align: center;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create Free Account</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="index.html" style="color: var(--accent-cyan); font-weight: 700;">Sign In here</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Script File -->
+  <script src="script.js"></script>
+</body>
+</html>

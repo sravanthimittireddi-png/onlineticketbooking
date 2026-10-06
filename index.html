@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicketBook — Book Your Experience. Enjoy Every Moment.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Main Navigation Header -->
+  <header class="site-header" id="main-header" style="display: none;">
+    <div class="container nav-container">
+      <div class="brand-logo" onclick="navigateTo('home')">
+        <div class="brand-icon">🎟️</div>
+        <div class="brand-text">
+          <div class="brand-name">Ticket<span>Book</span></div>
+          <div class="brand-tagline">Book Your Experience</div>
+        </div>
+      </div>
+
+      <!-- Active Mall Switcher Pill -->
+      <div class="nav-mall-badge" id="nav-mall-badge" onclick="navigateTo('malls')" title="Click to change mall">
+        <span>📍</span> <span id="nav-mall-name">Select Mall</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <ul class="nav-menu" id="nav-menu">
+        <li><a class="nav-link" id="nav-link-home" onclick="navigateTo('home')">Home</a></li>
+        <li><a class="nav-link" id="nav-link-events" onclick="navigateTo('events')">Events</a></li>
+        <li><a class="nav-link" id="nav-link-malls" onclick="navigateTo('malls')">Malls</a></li>
+        <li><a class="nav-link" id="nav-link-bookings" onclick="navigateTo('bookings')">My Bookings</a></li>
+      </ul>
+
+      <!-- User Profile & Actions -->
+      <div class="nav-user-profile">
+        <div class="user-badge" id="user-display-badge">
+          <div class="user-avatar" id="user-avatar-initial">U</div>
+          <span class="user-name-text" id="user-display-name">User</span>
+        </div>
+        <a href="admin.html" class="btn btn-outline btn-sm" id="admin-portal-link" style="display: none;">Admin Panel</a>
+        <button class="btn btn-secondary btn-sm" onclick="logoutUser()">Logout</button>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="mobile-menu-toggle" id="mobile-toggle-btn" onclick="toggleMobileMenu()">☰</button>
+    </div>
+  </header>
+
+  <!-- Main Application Container (Single Page Views) -->
+  <main id="app-container">
+
+    <!-- ==========================================
+         VIEW 1: LOGIN
+         ========================================== -->
+    <section id="view-login" class="view-section active">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <div class="brand-logo" style="justify-content: center; margin-bottom: 8px;">
+            <div class="brand-icon" style="width: 48px; height: 48px; font-size: 1.4rem;">🎟️</div>
+          </div>
+          <div class="auth-header">
+            <h1 class="auth-title">Welcome to <span class="text-gradient">TicketBook</span></h1>
+            <p class="auth-subtitle">Book Your Experience. Enjoy Every Moment.</p>
+          </div>
+
+          <form id="login-form" onsubmit="handleLoginSubmit(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email / User ID</label>
+              <input type="email" id="login-email" class="form-control" placeholder="name@example.com" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <div class="input-password-wrapper">
+                <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility('login-password')">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-role">Select Role</label>
+              <select id="login-role" class="form-control" required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 18px;">
+              <a href="#" onclick="openForgotPasswordModal(event)" style="font-size: 0.85rem; color: var(--accent-cyan);">Forgot Password?</a>
+            </div>
+
+            <div id="login-error-msg" class="form-error" style="margin-bottom: 14px; text-align: center;"></div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Sign In to TicketBook</button>
+          </form>
+
+          <!-- Quick Demo Credentials Box for Evaluation -->
+          <div class="demo-credentials-box">
+            <h4>💡 Quick Demo Login (Click to Auto-fill)</h4>
+            <div class="demo-chips">
+              <button type="button" class="demo-chip" onclick="fillDemoCredentials('user')">👤 Demo User</button>
+              <button type="button" class="demo-chip" onclick="fillDemoCredentials('admin')">🛡️ Demo Admin</button>
+            </div>
+          </div>
+
+          <div class="auth-footer">
+            Don't have an account? <a href="signup.html" style="color: var(--accent-cyan); font-weight: 700;">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: MALL SELECTION
+         ========================================== -->
+    <section id="view-malls" class="view-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Destination Guide</span>
+          <h2 class="section-title">Choose Your Mall</h2>
+          <p class="section-description">Select your favorite entertainment mall to explore exclusive movies, concerts, comedy shows and events.</p>
+        </div>
+
+        <div class="mall-grid" id="malls-container">
+          <!-- Dynamic Mall Cards rendered by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: HOME SECTION
+         ========================================== -->
+    <section id="view-home" class="view-section">
+      <div class="container">
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+          <div class="hero-content">
+            <span class="hero-tag">✨ Premium Entertainment Booking</span>
+            <h1 class="hero-title">Discover. Book. <span class="text-gradient">Experience.</span></h1>
+            <p class="hero-subtitle">
+              From high-octane blockbuster movies and pulsating live concerts to laugh-out-loud comedy specials and live theatre — get instant confirmed tickets with TicketBook.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-lg" onclick="navigateTo('events')">Explore Events 🎟️</button>
+              <div class="current-mall-pill">
+                <span>Selected:</span>
+                <strong id="home-mall-indicator">PVR INOX Mall</strong>
+                <a href="#" onclick="navigateTo('malls')" style="color: var(--accent-cyan); margin-left: 6px; text-decoration: underline;">Change</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="category-filter-bar">
+          <button class="category-pill active" onclick="filterHomeCategory('All', this)">🌟 All Categories</button>
+          <button class="category-pill" onclick="filterHomeCategory('Movies', this)">🎬 Movies</button>
+          <button class="category-pill" onclick="filterHomeCategory('Music', this)">🎵 Music</button>
+          <button class="category-pill" onclick="filterHomeCategory('Comedy', this)">🎙️ Comedy</button>
+          <button class="category-pill" onclick="filterHomeCategory('Sports', this)">🏆 Sports</button>
+          <button class="category-pill" onclick="filterHomeCategory('Theatre', this)">🎭 Theatre</button>
+          <button class="category-pill" onclick="filterHomeCategory('Concerts', this)">🎸 Concerts</button>
+          <button class="category-pill" onclick="filterHomeCategory('Live Shows', this)">🎪 Live Shows</button>
+        </div>
+
+        <!-- Featured Events Heading -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+          <div>
+            <h3 style="font-size: 1.6rem; font-weight: 800; color: #fff;" id="home-featured-heading">Exclusive Shows & Experiences</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;" id="home-featured-subheading">All 10 live experiences at your selected mall</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="navigateTo('events')">View All Events →</button>
+        </div>
+
+        <!-- Featured Events Grid -->
+        <div class="events-grid" id="home-featured-grid">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Why Choose TicketBook Features -->
+        <div class="features-grid">
+          <div class="feature-box">
+            <div class="feature-icon">⚡</div>
+            <h4 class="feature-title">Instant Digital Tickets</h4>
+            <p class="feature-desc">Zero waiting. Confirmed digital e-ticket generated instantly with your chosen seat reservations.</p>
+          </div>
+          <div class="feature-box">
+            <div class="feature-icon">🛡️</div>
+            <h4 class="feature-title">100% Guaranteed Seats</h4>
+            <p class="feature-desc">Real-time persistent seat locking prevents double-booking across all registered users.</p>
+          </div>
+          <div class="feature-box">
+            <div class="feature-icon">🔄</div>
+            <h4 class="feature-title">Hassle-Free Cancellation</h4>
+            <p class="feature-desc">Change of plans? Cancel your booking in one click and release seats with instant mock refunds.</p>
+          </div>
+          <div class="feature-box">
+            <div class="feature-icon">🏬</div>
+            <h4 class="feature-title">Top Entertainment Malls</h4>
+            <p class="feature-desc">Partnered with the finest multiplexes and lifestyle malls across the city.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 4: ALL EVENTS (SEARCH & FILTERS)
+         ========================================== -->
+    <section id="view-events" class="view-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag" id="events-mall-tag">Mall Events</span>
+          <h2 class="section-title" id="events-mall-title">Explore Events & Experiences</h2>
+          <p class="section-description" id="events-mall-desc">Filter by category, date or price to find the perfect entertainment experience.</p>
+        </div>
+
+        <!-- Filter Panel -->
+        <div class="events-filter-panel">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="event-search-input" class="form-control" placeholder="Search event by title, artist, or venue..." oninput="handleEventsFilter()">
+          </div>
+
+          <div class="filters-row">
+            <div>
+              <label class="form-label" for="filter-category">Category</label>
+              <select id="filter-category" class="form-control" onchange="handleEventsFilter()">
+                <option value="All">All Categories</option>
+                <option value="Movies">Movies</option>
+                <option value="Music">Music</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Sports">Sports</option>
+                <option value="Theatre">Theatre</option>
+                <option value="Concerts">Concerts</option>
+                <option value="Live Shows">Live Shows</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="form-label" for="filter-mall">Mall</label>
+              <select id="filter-mall" class="form-control" onchange="handleEventsFilter()">
+                <option value="All">All Malls</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div>
+              <label class="form-label" for="filter-date">Date</label>
+              <input type="date" id="filter-date" class="form-control" onchange="handleEventsFilter()">
+            </div>
+
+            <div>
+              <label class="form-label" for="filter-price">Price Filter</label>
+              <select id="filter-price" class="form-control" onchange="handleEventsFilter()">
+                <option value="All">All Prices</option>
+                <option value="under300">Under ₹300</option>
+                <option value="300to500">₹300 - ₹500</option>
+                <option value="above500">Above ₹500</option>
+                <option value="sortAsc">Price: Low to High</option>
+                <option value="sortDesc">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="events-grid" id="events-grid-container">
+          <!-- Populated by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 5: EVENT DETAILS
+         ========================================== -->
+    <section id="view-event-details" class="view-section">
+      <div class="container">
+        <div class="back-btn-bar">
+          <button class="btn btn-secondary btn-sm" onclick="navigateTo('events')">← Back to Events</button>
+        </div>
+
+        <div class="event-details-card" id="event-details-container">
+          <!-- Populated dynamically by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 6: SEAT SELECTION
+         ========================================== -->
+    <section id="view-seats" class="view-section">
+      <div class="container">
+        <div class="back-btn-bar">
+          <button class="btn btn-secondary btn-sm" onclick="navigateTo('event-details')">← Back to Event Details</button>
+        </div>
+
+        <div class="seat-booking-layout">
+          <!-- Cinema Hall View -->
+          <div class="cinema-container">
+            <div class="screen-projection-wrapper">
+              <div class="cinema-screen"></div>
+              <div class="screen-text">All eyes this way — Cinema Screen / Stage</div>
+            </div>
+
+            <!-- Legend -->
+            <div class="seat-legend">
+              <div class="legend-item">
+                <div class="seat-demo-sample" style="background: #182236; border: 1px solid rgba(255,255,255,0.2);"></div>
+                <span>Available</span>
+              </div>
+              <div class="legend-item">
+                <div class="seat-demo-sample" style="background: linear-gradient(135deg, var(--primary), var(--accent-cyan));"></div>
+                <span>Selected</span>
+              </div>
+              <div class="legend-item">
+                <div class="seat-demo-sample" style="background: #0f1624; border: 1px solid rgba(255,255,255,0.05); opacity: 0.5;"></div>
+                <span>Booked (Unavailable)</span>
+              </div>
+            </div>
+
+            <!-- Interactive 40 Seat Grid (Rows A to E, 8 Seats Each) -->
+            <div class="seat-matrix" id="seat-matrix-container">
+              <!-- Rendered dynamically by script.js -->
+            </div>
+          </div>
+
+          <!-- Checkout Order Summary Card -->
+          <div class="seat-summary-card">
+            <h3 class="summary-title">Booking Summary</h3>
+
+            <div class="summary-event-info">
+              <div class="summary-event-name" id="seat-summary-title">Event Title</div>
+              <div class="summary-mall-name" id="seat-summary-mall">Mall Name</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;" id="seat-summary-datetime">Date & Time</div>
+            </div>
+
+            <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-muted);">Selected Seats:</div>
+            <div class="selected-seats-badge-list" id="selected-seats-badges">
+              <span class="no-seats-text">No seats selected yet</span>
+            </div>
+
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Ticket Price</span>
+                <span id="seat-summary-price">₹0</span>
+              </div>
+              <div class="price-row">
+                <span>Quantity</span>
+                <span id="seat-summary-qty">0</span>
+              </div>
+              <div class="price-row">
+                <span>Convenience Fee</span>
+                <span id="seat-summary-fee">₹0</span>
+              </div>
+              <div class="price-row total-row">
+                <span>Total Amount</span>
+                <span id="seat-summary-total" class="text-cyan">₹0</span>
+              </div>
+            </div>
+
+            <button id="btn-proceed-payment" class="btn btn-primary btn-block btn-lg" onclick="proceedToPayment()" disabled>
+              Proceed to Payment →
+            </button>
+            <p style="font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 10px;">
+              🔒 Real-time seat hold enabled for your session
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 7: DEMO PAYMENT GATEWAY
+         ========================================== -->
+    <section id="view-payment" class="view-section">
+      <div class="container">
+        <div class="back-btn-bar">
+          <button class="btn btn-secondary btn-sm" onclick="navigateTo('seats')">← Back to Seat Selection</button>
+        </div>
+
+        <div class="payment-layout">
+          <!-- Payment Method Selection -->
+          <div class="payment-card">
+            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Choose Payment Method</h2>
+
+            <div class="payment-method-tabs">
+              <button class="tab-btn active" id="tab-btn-upi" onclick="switchPaymentTab('upi')">📱 UPI</button>
+              <button class="tab-btn" id="tab-btn-card" onclick="switchPaymentTab('card')">💳 Card</button>
+              <button class="tab-btn" id="tab-btn-wallet" onclick="switchPaymentTab('wallet')">👛 Wallet</button>
+            </div>
+
+            <!-- Tab 1: UPI -->
+            <div id="payment-tab-upi" class="payment-tab-content active">
+              <div class="form-group">
+                <label class="form-label" for="payment-upi-id">Virtual Payment Address (UPI ID)</label>
+                <input type="text" id="payment-upi-id" class="form-control" placeholder="yourname@okhdfcbank / yourname@upi" value="demo@okhdfcbank">
+                <small style="color: var(--text-dim); font-size: 0.78rem; display: block; margin-top: 4px;">Supports Google Pay, PhonePe, Paytm, BHIM</small>
+              </div>
+            </div>
+
+            <!-- Tab 2: Credit / Debit Card -->
+            <div id="payment-tab-card" class="payment-tab-content">
+              <div class="form-group">
+                <label class="form-label" for="payment-card-name">Cardholder Name</label>
+                <input type="text" id="payment-card-name" class="form-control" placeholder="Name as on Card">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="payment-card-number">Card Number</label>
+                <input type="text" id="payment-card-number" class="form-control" placeholder="4532 •••• •••• 8892" maxlength="19">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                  <label class="form-label" for="payment-card-expiry">Expiry Date</label>
+                  <input type="text" id="payment-card-expiry" class="form-control" placeholder="MM/YY" maxlength="5">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="payment-card-cvv">CVV</label>
+                  <input type="password" id="payment-card-cvv" class="form-control" placeholder="•••" maxlength="3">
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Digital Wallet -->
+            <div id="payment-tab-wallet" class="payment-tab-content">
+              <div class="form-group">
+                <label class="form-label" for="payment-wallet-select">Select Digital Wallet</label>
+                <select id="payment-wallet-select" class="form-control">
+                  <option value="Paytm">Paytm Wallet</option>
+                  <option value="Amazon Pay">Amazon Pay</option>
+                  <option value="PhonePe">PhonePe Wallet</option>
+                  <option value="Mobikwik">Mobikwik</option>
+                </select>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                A simulated debit confirmation will be triggered on your selected wallet.
+              </p>
+            </div>
+
+            <div class="payment-security-badge">
+              <span>🔒</span>
+              <div>
+                <strong>Demo Safe Checkout</strong>
+                <div style="font-size: 0.78rem;">No real card charges will occur. 100% simulated sandbox for SDC review.</div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block btn-lg" style="margin-top: 24px;" onclick="processPayment()">
+              Confirm & Pay <span id="pay-btn-amount">₹0</span>
+            </button>
+          </div>
+
+          <!-- Checkout Recap -->
+          <div class="seat-summary-card">
+            <h3 class="summary-title">Order Recap</h3>
+            <div class="summary-event-name" id="pay-summary-title">Event</div>
+            <div class="summary-mall-name" id="pay-summary-mall">Mall</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin: 6px 0 16px;" id="pay-summary-datetime">Date</div>
+
+            <div style="font-size: 0.88rem; color: var(--text-muted);">Seats: <strong id="pay-summary-seats" style="color: #fff;"></strong></div>
+            <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Tickets: <strong id="pay-summary-qty" style="color: #fff;"></strong></div>
+
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Base Amount</span>
+                <span id="pay-breakdown-base">₹0</span>
+              </div>
+              <div class="price-row">
+                <span>Convenience Fee</span>
+                <span id="pay-breakdown-fee">₹30</span>
+              </div>
+              <div class="price-row total-row">
+                <span>Grand Total</span>
+                <span id="pay-breakdown-total" class="text-cyan">₹0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 8: DIGITAL TICKET
+         ========================================== -->
+    <section id="view-ticket" class="view-section">
+      <div class="container ticket-wrapper">
+        <div class="ticket-container" id="printable-ticket">
+          <!-- Header -->
+          <div class="ticket-header">
+            <div class="brand-logo">
+              <div class="brand-icon">🎟️</div>
+              <div class="brand-text">
+                <div class="brand-name">Ticket<span>Book</span></div>
+                <div class="brand-tagline">OFFICIAL E-TICKET</div>
+              </div>
+            </div>
+            <div class="ticket-status-pill">Booking Confirmed ✓</div>
+          </div>
+
+          <!-- Body -->
+          <div class="ticket-body">
+            <div class="ticket-event-title" id="ticket-event-name">Event Title</div>
+            <div class="ticket-mall-venue" id="ticket-mall-venue">Mall Name • Audi 1</div>
+
+            <div class="ticket-grid-details">
+              <div class="meta-block">
+                <span class="meta-block-label">Booking Reference</span>
+                <span class="meta-block-val" id="ticket-booking-id" style="color: var(--accent-cyan); font-family: monospace;">TB-2026-0000</span>
+              </div>
+              <div class="meta-block">
+                <span class="meta-block-label">Guest Name</span>
+                <span class="meta-block-val" id="ticket-customer-name">John Doe</span>
+              </div>
+              <div class="meta-block">
+                <span class="meta-block-label">Date & Time</span>
+                <span class="meta-block-val" id="ticket-datetime">Oct 10, 2026 • 07:00 PM</span>
+              </div>
+              <div class="meta-block">
+                <span class="meta-block-label">Reserved Seats</span>
+                <span class="meta-block-val" id="ticket-seats-list" style="color: #6ee7b7;">A1, A2 (2 Tickets)</span>
+              </div>
+              <div class="meta-block">
+                <span class="meta-block-label">Amount Paid</span>
+                <span class="meta-block-val" id="ticket-total-paid">₹430</span>
+              </div>
+              <div class="meta-block">
+                <span class="meta-block-label">Payment Method</span>
+                <span class="meta-block-val" id="ticket-payment-method">UPI</span>
+              </div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+              Please present this digital confirmation at the entrance turnstile. Government photo ID required.
+            </div>
+          </div>
+
+          <!-- Perforated Tear Notch Line -->
+          <div class="ticket-notch-divider">
+            <div class="ticket-notch-left"></div>
+            <div class="ticket-dashed-line"></div>
+            <div class="ticket-notch-right"></div>
+          </div>
+
+          <!-- Footer -->
+          <div class="ticket-footer">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Barcode Reference</div>
+              <div class="ticket-barcode-sim" id="ticket-barcode">|||| | ||||| || |||||| |</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.75rem; color: var(--text-dim);">ISSUED BY</div>
+              <div style="font-size: 0.9rem; font-weight: 700; color: #fff;">TicketBook System</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket Action Controls -->
+        <div class="ticket-actions-bar">
+          <button class="btn btn-primary" onclick="downloadTicket()"><span style="font-size: 1.1rem;">🖨️</span> Download / Print Ticket</button>
+          <button class="btn btn-secondary" onclick="navigateTo('bookings')"><span style="font-size: 1.1rem;">📑</span> View My Bookings</button>
+          <button class="btn btn-outline" onclick="navigateTo('home')"><span style="font-size: 1.1rem;">🏠</span> Back to Home</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 9: MY BOOKINGS
+         ========================================== -->
+    <section id="view-bookings" class="view-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Booking History</span>
+          <h2 class="section-title">My Bookings</h2>
+          <p class="section-description">View active tickets, download passes or manage cancellations with instant seat release.</p>
+        </div>
+
+        <div class="bookings-filter-tabs">
+          <button class="btn btn-sm btn-secondary active" id="filter-book-all" onclick="filterMyBookings('All')">All Bookings</button>
+          <button class="btn btn-sm btn-secondary" id="filter-book-confirmed" onclick="filterMyBookings('Confirmed')">Confirmed</button>
+          <button class="btn btn-sm btn-secondary" id="filter-book-cancelled" onclick="filterMyBookings('Cancelled')">Cancelled / Refunded</button>
+        </div>
+
+        <div class="bookings-grid" id="my-bookings-container">
+          <!-- Populated dynamically by script.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODALS
+       ========================================== -->
+
+  <!-- 1. Forgot Password Modal -->
+  <div class="modal-backdrop" id="forgot-password-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size: 1.25rem; font-weight: 700;">Reset Account Password</h3>
+        <button class="modal-close-btn" onclick="closeForgotPasswordModal()">✕</button>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+        Enter your registered email address and your new password to reset your credentials.
+      </p>
+      <form onsubmit="handleForgotPasswordSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="reset-email">Registered Email</label>
+          <input type="email" id="reset-email" class="form-control" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reset-new-password">New Password</label>
+          <input type="password" id="reset-new-password" class="form-control" placeholder="Min. 6 characters" minlength="6" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Payment Processing Loader Overlay -->
+  <div id="payment-modal-overlay">
+    <div class="payment-modal-box">
+      <div class="spinner"></div>
+      <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">Processing Payment</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem;" id="payment-status-message">
+        Connecting with secure gateway...
+      </p>
+    </div>
+  </div>
+
+  <!-- Single shared script file -->
+  <script src="script.js"></script>
+</body>
+</html>
